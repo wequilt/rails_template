@@ -1,0 +1,29 @@
+version: '3'
+services:
+<% if false -%>
+  redis:
+    restart: always
+    image: redis:6.2.6
+    command: redis-server --port 6383
+    ports:
+      - "6383:6383"
+    expose:
+      - "6383"
+    volumes:
+      - redis:/data
+<% end -%>
+<% if postgres? -%>
+  postgres:
+    restart: always
+    image: postgres:15.2-alpine
+    ports:
+      - "<%= 5432 + port_offset -%>:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+<% end -%>
+volumes:
+<%= "  postgres:\n" if postgres? -%>
+

@@ -10,7 +10,7 @@ gem 'bootsnap', require: false
 gem 'faraday'
 gem 'globalid'
 gem 'graphql'
-gem 'pg'
+<%= gem_if_original 'pg' -%>
 gem 'puma'
 gem 'rails', '~> <%= [Rails::VERSION::MAJOR, Rails::VERSION::MINOR].join('.') %>'
 gem 'tzinfo-data'
