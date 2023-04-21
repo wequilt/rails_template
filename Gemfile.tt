@@ -1,0 +1,51 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+ruby '3.2.2'
+
+gem 'apollo-federation'
+gem 'bootsnap', require: false
+gem 'faraday'
+gem 'globalid'
+gem 'graphql'
+gem 'pg'
+gem 'puma'
+gem 'rails', '~> <%= [Rails::VERSION::MAJOR, Rails::VERSION::MINOR].join('.') %>'
+gem 'tzinfo-data'
+
+gem 'ddtrace', require: 'ddtrace/auto_instrument'
+
+group :production do
+  gem 'lograge'
+end
+
+group :development, :test do
+  gem 'bullet'
+  gem 'debug'
+  gem 'dotenv-rails'
+  gem 'faker'
+  gem 'guard-rspec'
+  gem 'guard-rubocop'
+  gem 'pry-rails'
+  gem 'rspec-rails'
+  gem 'rubocop', require: false
+  gem 'rubocop-graphql', require: false
+  gem 'rubocop-rails', require: false
+  gem 'rubocop-rspec', require: false
+end
+
+group :test do
+  gem 'factory_bot_rails'
+  gem 'hashie'
+  gem 'pundit-matchers'
+  gem 'shoulda-matchers'
+  gem 'simplecov', require: false
+  gem 'webmock'
+end
+
+group :development do
+  gem 'listen'
+  gem 'spring'
+end

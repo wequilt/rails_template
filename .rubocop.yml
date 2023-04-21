@@ -1,0 +1,68 @@
+---
+require:
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-graphql
+
+AllCops:
+  NewCops: enable
+GraphQL/ExtractInputType:
+  Enabled: false
+GraphQL/ExtractType:
+  Enabled: false
+GraphQL/FieldDescription:
+  Enabled: false
+GraphQL/NotAuthorizedNodeType:
+  Enabled: false # See: https://github.com/DmitryTsepelev/rubocop-graphql/issues/116
+Layout/EmptyLineAfterMultilineCondition:
+  Enabled: true
+Layout/EndAlignment:
+  Enabled: true
+  EnforcedStyleAlignWith: start_of_line
+Layout/FirstArgumentIndentation:
+  Enabled: true
+  EnforcedStyle: consistent
+Layout/FirstArrayElementIndentation:
+  Enabled: true
+  EnforcedStyle: consistent
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
+Layout/FirstHashElementIndentation:
+  Enabled: true
+  EnforcedStyle: consistent
+Layout/FirstHashElementLineBreak:
+  Enabled: true
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+Layout/FirstMethodParameterLineBreak:
+  Enabled: true
+Layout/FirstParameterIndentation:
+  Enabled: true
+  EnforcedStyle: consistent
+Layout/MultilineArrayBraceLayout:
+  Enabled: true
+Layout/MultilineArrayLineBreaks:
+  Enabled: true
+Layout/MultilineHashBraceLayout:
+  Enabled: true
+  EnforcedStyle: new_line
+Layout/MultilineHashKeyLineBreaks:
+  Enabled: true
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: true
+Metrics/MethodLength:
+  Max: 15
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+Rails/I18nLocaleTexts:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/MethodCallWithArgsParentheses:
+  AllowedMethods:
+    - puts
+    - raise
+    - render
+  Enabled: true
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
