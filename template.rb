@@ -30,6 +30,8 @@ template 'Gemfile.tt', force: true
 copy_file '.rubocop.yml'
 template 'docker-compose.yml.tt'
 
+environment "Bullet.enable = true\nBullet.rails_logger = true", env: %i[development test] if postgres?
+
 inside 'config' do
   template 'database.yml.tt', force: true if postgres?
 end
