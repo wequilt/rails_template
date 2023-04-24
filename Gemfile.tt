@@ -22,7 +22,9 @@ group :production do
 end
 
 group :development, :test do
+<% if postgres? -%>
   gem 'bullet'
+<% end -%>
   gem 'debug'
   gem 'dotenv-rails'
   gem 'faker'
