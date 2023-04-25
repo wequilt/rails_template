@@ -4,6 +4,19 @@ def app_name
   @app_name ||= Dir.pwd.split('/').last
 end
 
+def check_aws_capability!
+  begin
+    output = `aws sts get-caller-identity 2>&1`
+    if output.include?('An error occurred')
+      puts "Error talking to AWS: #{output}"
+      exit 1
+    end
+  rescue Errno::ENOENT
+    puts "AWS CLI is not installed. Please install it from https://aws.amazon.com/cli/"
+    exit 1
+  end
+end
+
 def gem_if_original(name)
   @original_gemfile ||= IO.read("Gemfile")
   @original_gemfile.include?("gem \"#{name}\"") ? "gem '#{name}'\n" : nil

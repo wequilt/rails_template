@@ -30,6 +30,12 @@ gem install bundler rails
 ```
 to install prerequisite gems.
 
+### AWS CLI
+Many of the services that this template configures requires access to AWS via the AWS CLI. See
+https://aws.amazon.com/cli/ for more information on the AWS CLI and
+https://www.notion.so/quilt/AWS-STS-Auth-Setup-dbceea78d75b4839b67d5739fcde726b for instructions to
+set up the CLI on your machine (with support for 2FA).
+
 ### Clone Me
 The last step before using this template is to clone it somewhere on your local machine. The
 template makes heavy use of Thor `template` and `copy_file` which don't work when the template is
