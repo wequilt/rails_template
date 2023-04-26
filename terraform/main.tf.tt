@@ -20,7 +20,7 @@ terraform {
 
   backend "s3" {
     bucket  = "quilt-terraform"
-    key     = "${local.app_name}/terraform.tfstate"
+    key     = "<%= app_name -%>/terraform.tfstate"
     profile = "quilt-mfa"
     region  = "us-west-2"
   }

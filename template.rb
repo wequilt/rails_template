@@ -32,9 +32,9 @@ end
 
 def port_offset
   @port_offset ||= ask(
-    <<~HERE.chomp.gsub(/\s+/, ' '),
+    <<~HERE.chomp.gsub(/\s+/, ' ')
       Service number (if there are 2 other services this will be service 3).
-      Used to generate port numbers in docker-compose.yml, etc'
+      Used to generate port numbers in docker-compose.yml, etc =>
     HERE
   ).to_i
 end
@@ -72,6 +72,7 @@ end
 check_aws_capability!
 
 add_secret('rds-master-password', SecureRandom.hex(32))
+add_secret('secret-key-base', SecureRandom.hex(64))
 
 copy_file '.rubocop.yml'
 copy_file 'atlantis.yaml'
@@ -84,10 +85,24 @@ inside 'config' do
   template 'database.yml.tt', force: true if postgres?
 end
 
+inside 'helm' do
+  template 'Chart.yaml.tt'
+  copy_file 'values.yaml'
+  inside 'templates' do
+    template 'deployment.yaml.tt'
+    template 'migration.yaml.tt' if postgres?
+    template 'service.yaml.tt'
+    copy_file 'deployment_hpa.yaml'
+    copy_file 'externalsecret.yaml'
+  end
+end
+
 inside 'terraform' do
-  template 'remote_state.tf.tt'
-  template 'rds.tf.tt' if postgres?
+  template 'irsa.tf.tt'
   template 'main.tf.tt'
+  template 'rds.tf.tt' if postgres?
+  template 'remote_state.tf.tt'
+  copy_file 'secrets.tf'
 end
 
 create_or_update_secrets!

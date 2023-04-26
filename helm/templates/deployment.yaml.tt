@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}"
+spec:
+  replicas: {{ .Values.deployment.minReplicas }}
+  selector:
+    matchLabels:
+      service: <%= app_name %>
+  template:
+    metadata:
+      labels:
+        service: <%= app_name %>
+    spec:
+      serviceAccountName: <%= app_name -%>-service-account
+      containers:
+      - name: <%= app_name %>
+        image: {{ .Values.image }}
+        resources:
+          limits:
+            memory: 700Mi
+          requests:
+            cpu: 200m
+            memory: 700Mi
+        env:
+        - name: AWS_REGION
+          value: us-west-2
+<% if postgres? -%>
+        # RDS_MASTER_PASSWORD _must_ come before DATABASE_URL for $(RDS_MASTER_PASSWORD) to work
+        - name: RDS_MASTER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}"
+              key: rds-master-password
+        - name: DATABASE_URL
+          value: postgres://root:$(RDS_MASTER_PASSWORD)@<%= app_name -%>-{{ .Values.env }}.cluster-cvrr8q7bvcpc.us-west-2.rds.amazonaws.com:5432/<%= app_name %>
+<% end -%>
+        - name: DD_AGENT_HOST
+          value: datadog.infrastructure.svc.cluster.local
+        - name: DD_ENV
+          value: "{{ .Values.env }}"
+        - name: DD_SERVICE
+          value: <%= app_name %>
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PORT
+          value: "3001"
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}"
+              key: secret-key-base
+        ports:
+        - name: http
+          containerPort: 3001
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 5

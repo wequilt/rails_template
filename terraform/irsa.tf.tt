@@ -1,0 +1,7 @@
+module "irsa" {
+  source = "git@github.com:wequilt/infrastructure.git//terraform/modules/irsa"
+  env    = terraform.workspace
+  name   = "<%= app_name -%>-service-account"
+
+  policy_arns = []
+}

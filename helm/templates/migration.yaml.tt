@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-migrations"
+  labels:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-migrations"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: migrations
+        image: {{ .Values.image }}
+        command: ["rake"]
+        args: ["db:migrate"]
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        env:
+        - name: DD_AGENT_HOST
+          value: datadog.infrastructure.svc.cluster.local
+        - name: DD_ENV
+          value: "{{ .Values.env }}"
+        - name: DD_SERVICE
+          value: <%= app_name -%>-migration
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}"
+              key: secret-key-base
+        - name: RDS_MASTER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}"
+              key: rds-master-password
+        - name: DATABASE_URL
+          value: postgres://root:$(RDS_MASTER_PASSWORD)@<%= app_name -%>-{{ .Values.env }}.cluster-cvrr8q7bvcpc.us-west-2.rds.amazonaws.com:5432/<%= app_name %>
