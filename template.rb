@@ -12,11 +12,15 @@ def app_name
   @app_name ||= Dir.pwd.split('/').last
 end
 
-def bullet_config
-  <<~BULLET
-    Bullet.enable = true
-    Bullet.rails_logger = true
-  BULLET
+def development_config
+  <<~CONFIG
+    # Enable Bullet gem to detect N+1 queries
+      Bullet.enable = true
+      Bullet.rails_logger = true
+
+      # Do not require auth from internal docker containers
+      config.host_authorization = { exclude: ->(request) { request.host =~ /host.docker.internal/ } }
+  CONFIG
 end
 
 def check_aws_capability!
@@ -114,7 +118,7 @@ end
 create_or_update_secrets!
 
 %i[development test].each do |env|
-  environment bullet_config, env: env if postgres?
+  gsub_file "config/environments/#{env}.rb", /# Settings specified here.*$/, development_config
   template '.env.tt', ".env.#{env}"
 end
 
