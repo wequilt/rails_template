@@ -12,6 +12,13 @@ def app_name
   @app_name ||= Dir.pwd.split('/').last
 end
 
+def bullet_config
+  <<~BULLET
+    Bullet.enable = true
+    Bullet.rails_logger = true
+  BULLET
+end
+
 def check_aws_capability!
   begin
     output = `aws sts get-caller-identity 2>&1`
@@ -34,7 +41,7 @@ def port_offset
   @port_offset ||= ask(
     <<~HERE.chomp.gsub(/\s+/, ' ')
       Service number (if there are 2 other services this will be service 3).
-      Used to generate port numbers in docker-compose.yml, etc =>
+      Used to generate port numbers in docker-compose.yml, etc. =>
     HERE
   ).to_i
 end
@@ -71,15 +78,14 @@ end
 
 check_aws_capability!
 
-add_secret('rds-master-password', SecureRandom.hex(32))
-add_secret('secret-key-base', SecureRandom.hex(64))
+add_secret 'rds-master-password', SecureRandom.hex(32)
+add_secret 'secret-key-base', SecureRandom.hex(64)
 
 copy_file '.rubocop.yml'
 copy_file 'atlantis.yaml'
 template 'docker-compose.yml.tt'
 template 'Gemfile.tt', force: true
 
-environment "Bullet.enable = true\nBullet.rails_logger = true", env: %i[development test] if postgres?
 
 inside 'config' do
   template 'database.yml.tt', force: true if postgres?
@@ -106,3 +112,40 @@ inside 'terraform' do
 end
 
 create_or_update_secrets!
+
+environment bullet_config, env: %i[development test] if postgres?
+
+gsub_file 'config/environments/production.rb', /# Use default logging formatter.*(# Do not dump schema)/m do |_match|
+  <<~LOGRAGE.chomp
+    # Configure Lograge to output logs as a single line of JSON per request
+      config.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
+      config.lograge.enabled = true
+      config.lograge.base_controller_class = 'ActionController::API'
+      config.lograge.formatter = Lograge::Formatters::Json.new
+      config.lograge.logger = ActiveSupport::Logger.new($stdout)
+
+      config.lograge.custom_payload do |controller|
+        if controller.is_a?(GraphqlController)
+          {
+            operation: controller.operation_name,
+            query: controller.query,
+            variables: controller.variables,
+            user_id: controller.context[:current_user]&.id
+          }
+        end
+      end
+
+      config.lograge.custom_options = lambda do |event|
+        {}.tap do |options|
+          unless event.payload[:exception_object].nil?
+            options[:exception] = {
+              backtrace: event.payload[:exception_object].backtrace,
+              message: event.payload[:exception_object].message
+            }
+          end
+        end
+      end
+
+      # Do not dump schema
+  LOGRAGE
+end
