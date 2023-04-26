@@ -39,7 +39,9 @@ set up the CLI on your machine (with support for 2FA).
 ### Clone Me
 The last step before using this template is to clone it somewhere on your local machine. The
 template makes heavy use of Thor `template` and `copy_file` which don't work when the template is
-used over HTTP.
+used over HTTP without some additional work (see
+https://github.com/mattbrictson/rails-template/blob/main/template.rb#L107 for inspiration on how to
+make this possible).
 
 ## Service Creation
 With your environment configurated you can now proceed to generating the new Rails app. The `rails
