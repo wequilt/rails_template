@@ -93,6 +93,9 @@ template 'Gemfile.tt', force: true
 
 inside 'config' do
   template 'database.yml.tt', force: true if postgres?
+  inside 'initializers' do
+    copy_file 'datadog.rb'
+  end
 end
 
 inside 'helm' do
