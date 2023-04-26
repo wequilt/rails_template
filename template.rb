@@ -113,7 +113,10 @@ end
 
 create_or_update_secrets!
 
-environment bullet_config, env: %i[development test] if postgres?
+%i[development test].each do |env|
+  environment bullet_config, env: env if postgres?
+  template '.env.tt', ".env.#{env}"
+end
 
 gsub_file 'config/environments/production.rb', /# Use default logging formatter.*(# Do not dump schema)/m do |_match|
   <<~LOGRAGE.chomp
