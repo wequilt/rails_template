@@ -85,14 +85,33 @@ check_aws_capability!
 add_secret 'rds-master-password', SecureRandom.hex(32)
 add_secret 'secret-key-base', SecureRandom.hex(64)
 
+create_file '.ruby-gemset', app_name
 copy_file '.rubocop.yml'
 copy_file 'atlantis.yaml'
 template 'docker-compose.yml.tt'
 template 'Gemfile.tt', force: true
+copy_file 'Guardfile'
 
+inside 'app' do
+  inside 'controllers' do
+    copy_file 'graphql_controller.rb'
+  end
+
+  inside 'graphql' do
+    copy_file 'schema.rb'
+  end
+
+  inside 'models' do
+    copy_file 'user.rb'
+  end
+end
 
 inside 'config' do
   template 'database.yml.tt', force: true if postgres?
+  copy_file 'routes.rb', force: true
+  inside 'environments' do
+    copy_file '.rubocop.yml'
+  end
   inside 'initializers' do
     copy_file 'datadog.rb'
   end
@@ -107,6 +126,17 @@ inside 'helm' do
     template 'service.yaml.tt'
     copy_file 'deployment_hpa.yaml'
     copy_file 'externalsecret.yaml'
+  end
+end
+
+inside 'spec' do
+  copy_file '.rubocop.yml'
+  copy_file 'factories.rb'
+  copy_file 'project_spec.rb'
+  copy_file 'rails_helper.rb'
+  copy_file 'spec_helper.rb'
+  inside 'controllers' do
+    copy_file 'graphql_controller_spec.rb'
   end
 end
 
@@ -159,3 +189,5 @@ gsub_file 'config/environments/production.rb', /# Use default logging formatter.
       # Do not dump schema
   LOGRAGE
 end
+
+run 'rubocop -A -f quiet'
