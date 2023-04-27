@@ -150,9 +150,9 @@ inside 'spec' do
   inside 'graphql' do
     copy_file 'schema_spec.rb'
 
-    # inside 'types' do
-    #   copy_file 'base_spec.rb'
-    # end
+    inside 'types' do
+      copy_file 'base_spec.rb'
+    end
 
     inside 'fields' do
       copy_file 'base_spec.rb'
