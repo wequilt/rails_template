@@ -99,6 +99,12 @@ inside 'app' do
 
   inside 'graphql' do
     copy_file 'schema.rb'
+
+    %w[types fields].each do |dir|
+      inside(dir)  { copy_file 'base.rb' }
+    end
+
+    inside('fields') { copy_file '.rubocop.yml' }
   end
 
   inside 'models' do
@@ -135,10 +141,30 @@ inside 'spec' do
   copy_file 'project_spec.rb'
   copy_file 'rails_helper.rb'
   copy_file 'spec_helper.rb'
+
   inside 'controllers' do
+    copy_file 'application_controller_spec.rb'
     copy_file 'graphql_controller_spec.rb'
   end
+
+  inside 'graphql' do
+    copy_file 'schema_spec.rb'
+
+    # inside 'types' do
+    #   copy_file 'base_spec.rb'
+    # end
+
+    inside 'fields' do
+      copy_file 'base_spec.rb'
+    end
+  end
+
+  inside 'models' do
+    copy_file 'application_record_spec.rb'
+    copy_file 'user_spec.rb'
+  end
 end
+run 'rm -rf test'
 
 inside 'terraform' do
   template 'irsa.tf.tt'
