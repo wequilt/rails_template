@@ -85,12 +85,15 @@ check_aws_capability!
 add_secret 'rds-master-password', SecureRandom.hex(32)
 add_secret 'secret-key-base', SecureRandom.hex(64)
 
+copy_file 'gitignore', '.gitignore', force: true
 create_file '.ruby-gemset', app_name
 copy_file '.rubocop.yml'
 copy_file 'atlantis.yaml'
 template 'docker-compose.yml.tt'
 template 'Gemfile.tt', force: true
 copy_file 'Guardfile'
+
+graphql_subdirs = %w[enums fields interfaces mutations scalars types]
 
 inside 'app' do
   inside 'controllers' do
@@ -100,11 +103,12 @@ inside 'app' do
   inside 'graphql' do
     copy_file 'schema.rb'
 
-    %w[types fields].each do |dir|
+    graphql_subdirs.each do |dir|
       inside(dir)  { copy_file 'base.rb' }
     end
 
     inside('fields') { copy_file '.rubocop.yml' }
+    inside('scalars') { copy_file '.rubocop.yml' }
   end
 
   inside 'models' do
@@ -150,12 +154,8 @@ inside 'spec' do
   inside 'graphql' do
     copy_file 'schema_spec.rb'
 
-    inside 'types' do
-      copy_file 'base_spec.rb'
-    end
-
-    inside 'fields' do
-      copy_file 'base_spec.rb'
+    graphql_subdirs.each do |dir|
+      inside(dir) { copy_file 'base_spec.rb' }
     end
   end
 
