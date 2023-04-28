@@ -109,6 +109,7 @@ create_file '.ruby-gemset', app_name
 process_files('global')
 process_files('postgres') if postgres?
 
+run 'chmod 755 docker/rails/entrypoint.sh'
 run 'rm -rf test'
 
 create_or_update_secrets!
