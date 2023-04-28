@@ -41,11 +41,11 @@ RSpec.configure do |config|
   end
 
   config.include(FactoryBot::Syntax::Methods)
-  # config.include(GraphQLContext, type: :graphql)
-  # config.include(GraphQLInspectionHelpers)
-  # config.include(GraphQLMutationContext, type: :graphql_mutation)
-  # config.include(GraphQLTypeContext, type: :graphql_type)
-  # config.include(UserHelpers)
+  config.include(GraphQLContext, type: :graphql)
+  config.include(GraphQLInspectionHelpers)
+  config.include(GraphQLMutationContext, type: :graphql_mutation)
+  config.include(GraphQLTypeContext, type: :graphql_type)
+  config.include(UserHelpers)
 end
 
 Shoulda::Matchers.configure do |config|

@@ -23,8 +23,8 @@ class Schema < GraphQL::Schema
 
   description "The schema for the #{Rails.application.class.module_parent.to_s} application."
 
-  # query Types::Query
-  # mutation Types::Mutation
+  query Types::Query
+  mutation Types::Mutation
 
   use GraphQL::Dataloader
   use GraphQL::Tracing::DataDogTracing, service: 'graphql'

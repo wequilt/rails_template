@@ -3,8 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Each file in app directory' do # rubocop:disable RSpec/DescribeClass
-  # EXCLUDE_DIRS = %w[graphql/enums graphql/fields policies/mutations policies/types].freeze
-  EXCLUDE_DIRS = [].freeze
+  EXCLUDE_DIRS = %w[policies/types policies/mutations].freeze
   EXCLUDE_FILES = [].freeze
 
   APP_PATH = Pathname.new(Rails.root).join('app')

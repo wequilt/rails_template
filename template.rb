@@ -109,6 +109,29 @@ inside 'app' do
 
     inside('fields') { copy_file '.rubocop.yml' }
     inside('scalars') { copy_file '.rubocop.yml' }
+
+    inside 'types' do
+      copy_file 'error.rb'
+      copy_file 'query.rb'
+      copy_file 'viewer.rb'
+      copy_file 'mutation.rb'
+    end
+  end
+
+  inside 'policies' do
+    copy_file 'application_policy.rb'
+    copy_file 'authentication_failed.rb'
+    copy_file 'authorization_failed.rb'
+
+    inside 'mutations' do
+      copy_file '.rubocop.yml'
+    end
+
+    inside 'types' do
+      copy_file 'mutation_policy.rb'
+      copy_file 'query_policy.rb'
+      copy_file 'viewer_policy.rb'
+    end
   end
 
   inside 'models' do
@@ -157,11 +180,31 @@ inside 'spec' do
     graphql_subdirs.each do |dir|
       inside(dir) { copy_file 'base_spec.rb' }
     end
+
+    inside 'types' do
+      copy_file 'viewer_spec.rb'
+    end
   end
 
   inside 'models' do
     copy_file 'application_record_spec.rb'
     copy_file 'user_spec.rb'
+  end
+
+  inside 'policies' do
+    copy_file 'application_policy_spec.rb'
+    copy_file 'authentication_failed_spec.rb'
+    copy_file 'authorization_failed_spec.rb'
+  end
+
+  inside 'support' do
+    copy_file '.rubocop.yml'
+    copy_file 'graphql_context.rb'
+    copy_file 'graphql_inspection_helpers.rb'
+    copy_file 'graphql_mutation_context.rb'
+    copy_file 'graphql_shared_context.rb'
+    copy_file 'graphql_type_context.rb'
+    copy_file 'user_helpers.rb'
   end
 end
 run 'rm -rf test'
