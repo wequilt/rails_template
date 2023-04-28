@@ -182,6 +182,9 @@ inside 'spec' do
     end
 
     inside 'types' do
+      copy_file 'error_spec.rb'
+      copy_file 'mutation_spec.rb'
+      copy_file 'query_spec.rb'
       copy_file 'viewer_spec.rb'
     end
   end

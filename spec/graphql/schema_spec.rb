@@ -33,8 +33,16 @@ RSpec.describe Schema do
       expect(object_from_id).to eq(object)
     end
 
-    context 'when the object is not found' do
+    context 'when the GID is invalid' do
       let(:id) { 'gid://app/Dummy/0' }
+
+      it 'returns nil' do
+        expect(object_from_id).to be_nil
+      end
+    end
+
+    context 'when the GID is valid but the object does not exist' do
+      before { allow(GlobalID).to receive(:find).with(id).and_raise(ActiveRecord::RecordNotFound) }
 
       it 'returns nil' do
         expect(object_from_id).to be_nil
@@ -59,6 +67,14 @@ RSpec.describe Schema do
 
     it 'returns the type name' do
       expect(resolve_type).to eq([Types::Base, object])
+    end
+  end
+
+  describe '.unauthorized_object' do
+    subject(:unauthorized_object) { described_class.unauthorized_object('message') }
+
+    it 'raises an error' do
+      expect { unauthorized_object }.to raise_error(AuthorizationFailed)
     end
   end
 end

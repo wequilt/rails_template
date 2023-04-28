@@ -21,6 +21,10 @@ RSpec.describe Types::Viewer do
     )
     end
 
+    it 'returns data for the logged in user' do
+      expect(data).to eq(id: current_user.id.to_s)
+    end
+
     context 'without authentication' do
       let(:current_user) { nil }
 
