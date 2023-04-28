@@ -12,6 +12,14 @@ def app_name
   @app_name ||= Dir.pwd.split('/').last
 end
 
+def bullet_config
+  <<~CONFIG
+    # Enable Bullet gem to detect N+1 queries
+      Bullet.enable = true
+      Bullet.rails_logger = true
+  CONFIG
+end
+
 def create_or_update_secrets!
   %i[prod stage dev].each do |env|
     name = "#{env}/service-#{app_name}"
@@ -31,12 +39,12 @@ def create_or_update_secrets!
 end
 
 def development_config
-  <<~CONFIG
-    # Enable Bullet gem to detect N+1 queries
-      Bullet.enable = true
-      Bullet.rails_logger = true
+  [postgres? ? bullet_config : nil, docker_config].compact.join("\n  ")
+end
 
-      # Do not require auth from internal docker containers
+def docker_config
+  <<~CONFIG
+    # Do not require auth from internal docker containers
       config.host_authorization = { exclude: ->(request) { request.host =~ /host.docker.internal/ } }
   CONFIG
 end
