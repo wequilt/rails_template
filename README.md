@@ -78,6 +78,9 @@ need to generate and push to GitHub before setting up in CodeClimate. When you'r
 new repository to CodeClimate, set up coverage reporting, and add as a new repository secret to
 GitHub, `CC_TEST_REPORTER_ID`, for both Actions and Dependabot.
 
+Once the repo is set up in CodeClimate you'll also want to replace the placeholders near the top of
+the new app's README.md with the code for maintainability and coverage badges.
+
 ##### CI
 With the `CC_TEST_REPORTER_ID` in place you should be able to re-run the `Stage + prod build and
 deploy` action in GitHub actions (should have failed previously due to the missing secret). Once

@@ -1,0 +1,92 @@
+<CC_MAINTAINABILITY_BADGE> <CC_COVERAGE_BADGE>
+
+# Quilt <%= app_name.capitalize %> Service
+<%= ask('Brief description of the new service =>') %>
+
+## Setup
+Setup should be pretty much the same as just about every other Rails app out
+there.
+
+### Ruby
+You'll need some kind of Ruby version manager (RVM, rbenv, etc) with the
+version of Ruby specified in
+[.ruby-version](https://github.com/wequilt/users/blob/master/.ruby-version)
+installed. If you use RVM a gemset named `users` will be created for you and
+used.
+
+<% if postgres? -%>
+### Postgres
+You'll need to have postgres installed (not running, just installed). Run
+`brew install postgresql` but don't bother with the steps to run Postgres
+locally. This is only so the correct libraries are there for the `pg` gem
+which has native extensions.
+
+<% end -%>
+### docker-compose
+You can run isolated versions of this app's dependent services using docker-compose.
+To get these services started simply run `docker-compose up` (or `docker compose up`).
+
+You can run a fuller stack including the Rails web app by doing:
+
+```
+docker compose -f docker-compose.yml -f docker-compose.full.yml up [--build] [--detach]
+```
+
+### Environment Variables
+For development convenience, Rails will load any required environment variables
+from `.env` in the `development` and `test` environments. This file is committed
+to `.git` and should _never_ contain secrets. For more information on the
+handling of secret values in rails see [this
+guide](https://edgeguides.rubyonrails.org/security.html#environmental-security).
+
+### First Run
+Just do the normal stuff you'd do to run a rails app and you should be 👌.
+```shell
+bundle
+<% if postgres? -%>
+bundle exec rake db:create:all
+bundle exec rake db:migrate
+<% end -%>
+bundle exec rails s -b 0.0.0.0
+```
+the `-b 0.0.0.0` isn't strictly needed but if you ever want an application
+running on another computer (such as a mobile app) to be able to access your
+development server you need to include that. So just get used to it and then
+you won't be frustrated later.
+
+## Tests
+This app uses RSpec as its testing framework. Running the full test suite should
+be as simple as
+```shell
+bundle exec rake db:test:prepare
+bundle exec rspec .
+```
+You can also use Guard to run tests as files change
+```shell
+bundle exec rake db:test:prepare
+bundle exec guard
+```
+
+## Terraform
+macOS: `brew install terraform`
+
+### Setup
+1. Clone this repo
+1. `cd terraform`
+1. `terraform workspace select <ENV>` (e.g., `dev`, `stage`, `prod`)
+1. Run `terraform init` to download the specified providers
+
+### Usage
+Use `terraform plan` to see what the configuration wishes to change.
+
+Use `terraform apply` to actually apply changes.
+
+### Adding or Upgrading Providers
+When adding or upgrading a provider, be sure to run the following and commit the lock file:
+
+```
+terraform providers lock -platform=darwin_amd64 -platform=darwin_arm64 -platform=linux_amd64
+```
+
+Upcoming terraform 1.4 should [resolve](https://github.com/hashicorp/terraform/issues/28041) the need to do this, at
+which point these instructions can be removed.
