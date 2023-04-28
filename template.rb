@@ -74,7 +74,7 @@ end
 
 def process_files(subdir)
   "#{template_path}/#{subdir}".then do |path|
-    Dir["#{path}/**/{.*,*}"].each do |file|
+    Dir["#{path}/{**,.github/**}/{.*,*}"].each do |file|
       next if File.directory?(file)
       relative_path = file.sub(%r{^#{path}/?}, '')
 
@@ -155,3 +155,15 @@ gsub_file 'config/environments/production.rb', /# Use default logging formatter.
 end
 
 run 'rubocop -A -f quiet'
+
+after_bundle do
+  repo = "git@github.com:wequilt/#{app_name}.git"
+  if yes?("Commit and push to github (#{repo})?")
+    git :init
+    git add: '.'
+    git commit: "-m 'Initial commit'"
+    git branch: '-M main'
+    git remote: "add origin #{repo}"
+    git push: '-u origin main'
+  end
+end

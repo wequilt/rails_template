@@ -1,0 +1,32 @@
+name: Deploy to Kubernetes via Helm
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      GHA_ACCESS_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Deploy application via Helm
+        uses: peymanmortazavi/eks-helm-deploy@v2.2.1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          cluster-name: ${{ inputs.env }}
+          values: env=${{ inputs.env }},image=837446660443.dkr.ecr.us-west-2.amazonaws.com/service/<%= app_name -%>:${{ github.sha }}
+          name: service-<%= app_name %>

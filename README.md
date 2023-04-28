@@ -43,6 +43,22 @@ used over HTTP without some additional work (see
 https://github.com/mattbrictson/rails-template/blob/main/template.rb#L107 for inspiration on how to
 make this possible).
 
+### Repository Configuration
+Assuming this new service will live in GitHub with all of its service siblings it's best to prepare
+the repository before running the Rails generator. At the end of app generation you will be given a
+chance to create and push an initial commit. Having some things set up before hand will ensure this
+process goes smoothly.
+
+*Do not enable branch protections for `main` before running this generator. Otherwise you the
+generator won't be able to push to GitHub*
+
+These are the steps you'll want to follow to create and configure a new repository.
+1. Create the repo in GitHub. Choose all options to make an empty repository (no default README,
+   .gitignore, etc).
+2. Grant the new repository access to the `APOLLO_API_KEY`, `AWS_ACCESS_KEY_ID`,
+   `AWS_SECRET_ACCESS_KEY`, and `GHA_ACCESS_TOKEN` Actions organization secrets in GitHub. Also
+   grant access to the `APOLLO_API_KEY` Dependabot secret in GitHub.
+
 ## Service Creation
 With your environment configurated you can now proceed to generating the new Rails app. The `rails
 new` command takes many options that can help configure an app with the specific capabilities you
@@ -51,3 +67,24 @@ require. Some commonly selected options are things like `--api` to create an API
 --help`. Once you've selected the set of options that makes the most sense for your application, run
 `rails new <selected_options> -m <location_of_cloned_repo>/template.rb`
 to create the new application.
+
+### Finishing Up
+You're almost there, in the home stretch. Once your new app is pushed to GitHub there are just a few
+final things you need to do for everything to be completely set up.
+
+##### CodeClimate
+For whatever reason, CodeClimate doesn't really allow you to add an empty repository so you will
+need to generate and push to GitHub before setting up in CodeClimate. When you're ready, add the
+new repository to CodeClimate, set up coverage reporting, and add as a new repository secret to
+GitHub, `CC_TEST_REPORTER_ID`, for both Actions and Dependabot.
+
+##### CI
+With the `CC_TEST_REPORTER_ID` in place you should be able to re-run the `Stage + prod build and
+deploy` action in GitHub actions (should have failed previously due to the missing secret). Once
+this passes you're almost there.
+
+##### GitHub Permissions
+Now that you have a `main` branch you need to protect it. You can copy the settings from an existing
+repo but essentially you want to require a PR to merge, require one approval on that PR, dismiss
+stale approvals, and require a review from Code Owners. You'll also want to make the `test / test`
+and `atlantis/plan` actions to pass and branches to be up to date before merging.
