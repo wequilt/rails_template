@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-schema-publish"
+  labels:
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-schema-publish"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: schema-publish
+        image: {{ .Values.image }}
+        command: ["rake"]
+        args: ["graphql:federation:publish"]
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        env:
+        - name: DD_AGENT_HOST
+          value: datadog.infrastructure.svc.cluster.local
+        - name: DD_ENV
+          value: "{{ .Values.env }}"
+        - name: DD_SERVICE
+          value: <%= app_name -%>-publish-schema
+        - name: APOLLO_VARIANT
+          {{- if eq .Values.env "prod" }}
+          value: production
+          {{- else if eq .Values.env "stage" }}
+          value: staging
+          {{- else }}
+          value: development
+          {{- end }}
+        - name: APOLLO_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}"
+              key: apollo-key
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}"
+              key: secret-key-base
+<% if postgres? -%>
+        # RDS_MASTER_PASSWORD _must_ come before DATABASE_URL for $(RDS_MASTER_PASSWORD) to work
+        - name: RDS_MASTER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}"
+              key: rds-master-password
+        - name: DATABASE_URL
+          value: postgres://root:$(RDS_MASTER_PASSWORD)@<%= app_name -%>-{{ .Values.env }}.cluster-cvrr8q7bvcpc.us-west-2.rds.amazonaws.com:5432/<%= app_name %>
+<% end -%>
