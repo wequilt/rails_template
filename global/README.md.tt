@@ -34,10 +34,10 @@ docker compose -f docker-compose.yml -f docker-compose.full.yml up [--build] [--
 
 ### Environment Variables
 For development convenience, Rails will load any required environment variables
-from `.env` in the `development` and `test` environments. This file is committed
-to `.git` and should _never_ contain secrets. For more information on the
-handling of secret values in rails see [this
-guide](https://edgeguides.rubyonrails.org/security.html#environmental-security).
+from `.env[.development|.test]` in the `development` and `test` environments.
+This file is committed to `.git` and should _never_ contain secrets.
+For more information on the handling of see
+[Production Secrets](https://www.notion.so/quilt/Production-Secrets-81c7239fd6b44f129ce75ecd9dfb6cbb).
 
 ### First Run
 Just do the normal stuff you'd do to run a rails app and you should be 👌.
