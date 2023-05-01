@@ -85,7 +85,7 @@ Use `terraform apply` to actually apply changes.
 When adding or upgrading a provider, be sure to run the following and commit the lock file:
 
 ```
-terraform providers lock -platform=darwin_amd64 -platform=darwin_arm64 -platform=linux_amd64
+terraform providers lock -platform=darwin_amd64 -platform=darwin_arm64 -platform=linux_amd64 -platform=linux_arm64
 ```
 
 Upcoming terraform 1.4 should [resolve](https://github.com/hashicorp/terraform/issues/28041) the need to do this, at
