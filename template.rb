@@ -26,8 +26,7 @@ def create_or_update_secrets!
     action, color = :create, :green
     output = `aws secretsmanager create-secret --name #{name} --secret-string #{secret_string} 2>&1`
     if output.include?('ResourceExistsException')
-      output = `aws secretsmanager put-secret-value --secret-id #{name} --secret-string #{secret_string} 2>&1`
-      action, color = :update, :yellow
+      action, color = :skip, :yellow
     end
 
     if output.include?('An error occurred')
