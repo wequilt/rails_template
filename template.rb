@@ -127,7 +127,6 @@ create_or_update_secrets!
 
 %i[development test].each do |env|
   gsub_file "config/environments/#{env}.rb", /# Settings specified here.*$/, development_config
-  template '.env.tt', ".env.#{env}"
 end
 
 gsub_file 'config/environments/production.rb', /# Use default logging formatter.*(# Do not dump schema)/m do |_match|
