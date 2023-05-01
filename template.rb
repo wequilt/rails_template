@@ -80,6 +80,10 @@ def postgres?
   gem_if_original('pg').present?
 end
 
+def postgres_version
+  '15.2'
+end
+
 def process_files(subdir)
   "#{template_path}/#{subdir}".then do |path|
     Dir["#{path}/{**,.github/**}/{.*,*}"].each do |file|

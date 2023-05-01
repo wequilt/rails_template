@@ -3,7 +3,7 @@ services:
 <% if postgres? -%>
   postgres:
     restart: always
-    image: postgres:15.2-alpine
+    image: postgres:<%= postgres_version -%>-alpine
     ports:
       - "<%= 5432 + port_offset -%>:5432"
     volumes:
