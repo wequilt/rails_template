@@ -1,0 +1,43 @@
+resource "aws_db_subnet_group" "postgres" {
+  name        = "${local.app_name}-${local.env}"
+  description = "Database subnet group for ${local.env}"
+  subnet_ids  = data.terraform_remote_state.core.outputs.eks_private_subnet_ids
+}
+
+resource "aws_security_group" "postgres" {
+  name        = "${local.app_name}-postgres-${local.env}"
+  description = "Allow Postgres inbound traffic from EKS private IPs"
+  vpc_id      = data.terraform_remote_state.core.outputs.eks_vpc_id
+
+  ingress {
+    description = "Allow Postgres traffic from pods"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = data.terraform_remote_state.core.outputs.vpc_private_cidr_blocks
+  }
+}
+
+resource "aws_rds_cluster" "postgres" {
+  cluster_identifier      = "${local.app_name}-${local.env}"
+  engine                  = "aurora-postgresql"
+  engine_version          = "<%= postgres_version -%>"
+  availability_zones      = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  database_name           = local.app_name
+  master_username         = "root"
+  master_password         = jsondecode(data.aws_secretsmanager_secret_version.service.secret_string)["rds-master-password"]
+  backup_retention_period = 10
+  preferred_backup_window = "04:00-06:00"
+  db_subnet_group_name    = aws_db_subnet_group.postgres.id
+  vpc_security_group_ids  = [aws_security_group.postgres.id]
+}
+
+resource "aws_rds_cluster_instance" "postgres" {
+  count                      = 2
+  identifier_prefix          = "${local.app_name}-${local.env}"
+  cluster_identifier         = aws_rds_cluster.postgres.id
+  engine                     = "aurora-postgresql"
+  instance_class             = local.db_instance_class
+  db_subnet_group_name       = aws_db_subnet_group.postgres.id
+  auto_minor_version_upgrade = false
+}

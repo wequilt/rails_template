@@ -1,0 +1,25 @@
+version: 3
+projects:
+  - name: dev
+    dir: terraform/
+    autoplan:
+      when_modified: [ "../terraform/**/*", "../atlantis.yaml" ]
+      enabled: true
+    apply_requirements: [ mergeable ]
+    workspace: dev
+
+  - name: stage
+    dir: terraform/
+    autoplan:
+      when_modified: [ "../terraform/**/*", "../atlantis.yaml" ]
+      enabled: true
+    apply_requirements: [ mergeable ]
+    workspace: stage
+
+  - name: prod
+    dir: terraform/
+    autoplan:
+      when_modified: [ "../terraform/**/*", "../atlantis.yaml" ]
+      enabled: true
+    apply_requirements: [ mergeable ]
+    workspace: prod

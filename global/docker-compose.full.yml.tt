@@ -1,0 +1,22 @@
+version: '3'
+services:
+  web:
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    entrypoint: ./docker/rails/entrypoint.sh
+    command: bundle exec rails server -b 0.0.0.0
+    environment:
+      - RAILS_ENV=development
+<% if postgres? -%>
+      - DATABASE_URL=postgresql://postgres:5432
+<% end -%>
+    ports:
+      - "<%= 3000 + port_offset -%>:3000"
+    volumes:
+      - .:/app
+    links:
+<% if postgres? -%>
+      - postgres
+<% end -%>

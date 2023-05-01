@@ -1,0 +1,90 @@
+name: Run tests and upload coverage to CodeClimate
+
+on:
+  workflow_call:
+    secrets:
+      CC_TEST_REPORTER_ID:
+        required: true
+      APOLLO_KEY_API:
+        required: true
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-20.04
+
+<% if postgres? -%>
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+<% end -%>
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: <%= RUBY_VERSION %>
+
+<% if postgres? -%>
+      - name: Install postgres client library
+        run: |
+          sudo apt-get -yqq install libpq-dev
+
+<% end -%>
+      - name: Cache bundle install
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-cache-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cache-gems-
+
+      - name: Bundle install
+        env:
+          RAILS_ENV: test
+        run: |
+          gem install bundler:2.3.7
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Run Rubocop format/style check
+        run: |
+          bundle exec rubocop
+
+<% if postgres? -%>
+      - name: Setup database
+        env:
+          RAILS_ENV: test
+          REDIS_URL: redis://localhost:6379
+        run: bin/rails db:setup
+
+<% end -%>
+      - name: Ensure schema is composable
+        env:
+          APOLLO_KEY: ${{ secrets.APOLLO_KEY_API }}
+        run: |
+          npm install -g @apollo/rover
+          APOLLO_VARIANT=staging bundle exec rake graphql:federation:check
+          APOLLO_VARIANT=production bundle exec rake graphql:federation:check
+
+      - name: Run tests and report coverage
+        uses: paambaati/codeclimate-action@v4.0.0
+        env:
+          RAILS_ENV: test
+          REDIS_URL: redis://localhost:6379
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: bundle exec rspec
+          debug: true

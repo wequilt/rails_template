@@ -1,0 +1,43 @@
+# frozen_string_literal: true
+
+class Rover
+  attr_accessor :command
+
+  def initialize(command = :check)
+    @command = command.to_sym
+  end
+
+  def run
+    Tempfile.create('schema') do |f|
+      f.write(Schema.federation_sdl)
+      f.flush
+      system(cmdline(f))
+    end
+  end
+
+  private
+
+  def variant
+    @variant ||= ENV.fetch('APOLLO_VARIANT', Rails.env)
+  end
+
+  def base
+    "rover subgraph #{command} quilt-api@#{variant}"
+  end
+
+  def cmdline(file)
+    "#{base} --name <%= app_name -%> --schema \"#{file.path}\" #{optional_args}".strip
+  end
+
+  def optional_args
+    "--routing-url #{routing_url}" if command == :publish
+  end
+
+  def routing_url
+    if variant == 'local'
+      'http://localhost:3000/graphql'
+    else
+      'http://service-<%= app_name -%>/graphql'
+    end
+  end
+end

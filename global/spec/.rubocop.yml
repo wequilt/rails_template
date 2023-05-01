@@ -1,0 +1,25 @@
+inherit_from: '../.rubocop.yml'
+
+GraphQL/ObjectDescription:
+  Enabled: false
+Lint/ConstantDefinitionInBlock:
+  Enabled: false
+Lint/EmptyClass:
+  Enabled: false
+Metrics/BlockLength:
+  AllowedMethods:
+    - describe
+    - context
+    - define
+RSpec/ExampleLength:
+  Enabled: false
+RSpec/LeakyConstantDeclaration:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Max: 1
+Style/MethodCallWithArgsParentheses:
+  AllowedMethods:
+    - puts
+    - to
+    - not_to
+    - describe

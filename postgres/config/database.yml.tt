@@ -1,0 +1,19 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+local_default: &local_default
+  <<: *default
+  host: 127.0.0.1
+  port: <%= 5432 + port_offset %>
+  username: postgres
+  password: password
+
+development:
+  <<: *local_default
+  database: <%= app_name -%>_development
+
+test:
+  <<: *local_default
+  database: <%= app_name -%>_test
