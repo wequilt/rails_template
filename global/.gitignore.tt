@@ -32,3 +32,6 @@
 
 # Terraform
 terraform/.terraform/*
+
+# Never commit .env because of risk it could apply to production
+.env
