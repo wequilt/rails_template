@@ -1,6 +1,6 @@
 <CC_MAINTAINABILITY_BADGE> <CC_COVERAGE_BADGE>
 
-# Quilt <%= app_name.capitalize %> Service
+# <%= app_name.capitalize %> Service
 <%= ask('Brief description of the new service =>') %>
 
 ## Setup
