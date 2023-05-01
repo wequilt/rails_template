@@ -13,7 +13,7 @@ services:
       - DATABASE_URL=postgresql://postgres:5432
 <% end -%>
     ports:
-      - "3001:3000"
+      - "<%= 3000 + port_offset -%>:3000"
     volumes:
       - .:/app
     links:
