@@ -2,5 +2,5 @@ inherit_from: '../../.rubocop.yml'
 
 Metrics/BlockLength:
   AllowedMethods:
-    - configure
+  - configure
 
