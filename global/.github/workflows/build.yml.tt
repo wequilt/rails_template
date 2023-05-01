@@ -35,7 +35,7 @@ jobs:
           aws ecr create-repository --repository-name service/<%= app_name -%> || true
 
       - name: Build and push image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           push: true
           tags:

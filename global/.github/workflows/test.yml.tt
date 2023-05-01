@@ -30,7 +30,7 @@ jobs:
 
 <% end -%>
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -43,7 +43,7 @@ jobs:
 
 <% end -%>
       - name: Cache bundle install
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache
         with:
           path: vendor/bundle
@@ -80,7 +80,7 @@ jobs:
           APOLLO_VARIANT=production bundle exec rake graphql:federation:check
 
       - name: Run tests and report coverage
-        uses: paambaati/codeclimate-action@v2.7.5
+        uses: paambaati/codeclimate-action@v4.0.0
         env:
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379
