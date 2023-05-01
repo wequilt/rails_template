@@ -41,7 +41,6 @@ end
 group :test do
   gem 'factory_bot_rails'
   gem 'hashie'
-  gem 'pundit-matchers'
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
   gem 'webmock'
