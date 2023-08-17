@@ -15,6 +15,7 @@ proceeding. Popular version managers include:
 * [rbenv](https://github.com/rbenv/rbenv)
 * [chruby](https://github.com/postmodern/chruby)
 * [frum](https://github.com/tako8ki/frum)
+
 There are likely others and any of them should work fine. You'll need to select (and install) the
 version of Ruby you'd like to use for this new service. In general you'll want to choose the
 latest stable Ruby version but whatever version you choose, make sure you have installed and
