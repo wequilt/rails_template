@@ -57,11 +57,21 @@ spec:
         - name: http
           containerPort: 3001
         livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 5
+          periodSeconds: 10
+          exec:
+            command:
+              - sh
+              - -c
+              - >
+                response=$(curl -X POST -H "Content-Type: application/json" --data '{"query": "query { health { shallowCheck } }"}' http://localhost:3000/graphql)
+                echo $response | jq -e '.data.health.shallowCheck == true'
+        startupProbe:
+          failureThreshold: 30
+          periodSeconds: 3
+          exec:
+            command:
+              - sh
+              - -c
+              - >
+                response=$(curl -X POST -H "Content-Type: application/json" --data '{"query": "query { health { deepCheck } }"}' http://localhost:3000/graphql)
+                echo $response | jq -e '.data.health.deepCheck == true'
