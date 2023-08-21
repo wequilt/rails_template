@@ -11,3 +11,4 @@ jobs:
     secrets:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       APOLLO_KEY_API: ${{ secrets.APOLLO_KEY_API }}
+      APOLLO_KEY_ADMIN_API: ${{ secrets.APOLLO_KEY_ADMIN_API }}

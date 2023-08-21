@@ -7,11 +7,19 @@ class GraphqlController < ApplicationController
 
   rescue_from StandardError, with: :handle_error
 
-  def execute
-    render json: Schema.execute(query, variables:, context:, operation_name:)
+  def admin_execute
+    render json: Admin::Schema.execute(query, variables:, context: admin_context, operation_name:)
   end
 
-  def context
+  def public_execute
+    render json: Schema.execute(query, variables:, context: public_context, operation_name:)
+  end
+
+  def admin_context
+    { current_user: current_admin_user }
+  end
+
+  def public_context
     { current_user: }
   end
 
@@ -43,15 +51,10 @@ class GraphqlController < ApplicationController
     nil
   end
 
-  def raw_vars
-    @raw_vars ||= params[:variables]
-  end
+  def current_admin_user
+    return unless (email = request.headers['X-Auth-Request-Email'])
 
-  def handle_error_in_development(err)
-    logger.error(err.message)
-    logger.error(err.backtrace.join("\n"))
-
-    render exception_json(err)
+    AdminUser.new(email:)
   end
 
   def exception_json(err)
@@ -68,5 +71,16 @@ class GraphqlController < ApplicationController
     raise exception unless Rails.env.development?
 
     handle_error_in_development(exception)
+  end
+
+  def handle_error_in_development(err)
+    logger.error(err.message)
+    logger.error(err.backtrace.join("\n"))
+
+    render exception_json(err)
+  end
+
+  def raw_vars
+    @raw_vars ||= params[:variables]
   end
 end

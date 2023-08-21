@@ -144,7 +144,7 @@ gsub_file 'config/environments/production.rb', /# Use default logging formatter.
             operation: controller.operation_name,
             query: controller.query,
             variables: controller.variables,
-            user_id: controller.context[:current_user]&.id
+            user_id: controller.public_context[:current_user]&.id || controller.admin_context[:current_user]&.id
           }
         end
       end

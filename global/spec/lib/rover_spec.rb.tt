@@ -1,0 +1,95 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+require 'rover'
+
+RSpec.describe Rover do
+  let(:admin) { false }
+  let(:command) { :check }
+  let(:schema) { Schema }
+  let(:success) { true }
+  let(:rover) { described_class.new(command:, admin:) }
+
+  describe '#run' do
+    before do
+      allow(schema).to receive(:federation_sdl).and_call_original
+      allow(rover).to receive(:system).and_return(success)
+      rover.run
+    end
+
+    it 'requests the corrrect federation schema' do
+      expect(schema).to have_received(:federation_sdl)
+    end
+
+    it 'uses the correct apollo key' do
+      expect(rover).to have_received(:system).with(/^APOLLO_KEY=dummy/)
+    end
+
+    it 'executes the correct rover command' do
+      expect(rover).to have_received(:system).with(/rover subgraph #{command} quilt-api@test/)
+    end
+
+    it 'includes the correct --name argument' do
+      expect(rover).to have_received(:system).with(/--name <%= app_name %>/)
+    end
+
+    it 'includes the correct --schema argument' do
+      expect(rover).to have_received(:system).with(%r{--schema "[-_/A-Za-z0-9]+"})
+    end
+
+    it 'does not include a --routing-url argument' do
+      expect(rover).not_to have_received(:system).with(/--routing-url/)
+    end
+
+    context 'when working with the admin schema' do
+      let(:admin) { true }
+      let(:schema) { Admin::Schema }
+      let(:command) { :publish }
+
+      it 'uses the correct schema and passes a context with the ability to introspect' do
+        expect(schema).to have_received(:federation_sdl).with(context: { current_user: AdminUser })
+      end
+
+      it 'uses the correct apollo key' do
+        expect(rover).to have_received(:system).with(/^APOLLO_KEY=admindummy/)
+      end
+
+      it 'checks the admin supergraph instead' do
+        expect(rover).to have_received(:system).with(/liminal-admin-api@test/)
+      end
+
+      it 'includes the correct --routing-url argument' do
+        expect(rover).to have_received(:system).with(%r{--routing-url http://service-<%= app_name %>/graphql/admin})
+      end
+    end
+
+    context 'when executing a publish command' do
+      let(:command) { :publish }
+
+      it 'includes the correct --routing-url argument' do
+        expect(rover).to have_received(:system).with(%r{--routing-url http://service-<%= app_name %>/graphql})
+      end
+    end
+
+    context 'when APOLLO_VARIANT is local' do
+      let(:command) { :publish }
+      let(:rover_local) { described_class.new(command:, admin:) }
+
+      before do
+        ENV['APOLLO_VARIANT'] = 'local'
+        allow(rover_local).to receive(:system).and_return(success)
+        rover_local.run
+      end
+
+      after { ENV.delete('APOLLO_VARIANT') }
+
+      it 'executes rover against the correct variant' do
+        expect(rover_local).to have_received(:system).with(/quilt-api@local/)
+      end
+
+      it 'includes the correct --routing-url argument' do
+        expect(rover_local).to have_received(:system).with(%r{--routing-url http://localhost:<%= 3000 + port_offset %>/graphql})
+      end
+    end
+  end
+end

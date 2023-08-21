@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 class Rover
-  attr_accessor :command
+  attr_accessor :command, :admin
 
-  def initialize(command = :check)
+  def initialize(command: :check, admin: false)
     @command = command.to_sym
+    @admin = admin
   end
 
   def run
     Tempfile.create('schema') do |f|
-      f.write(Schema.federation_sdl)
+      f.write(schema.federation_sdl(context:))
       f.flush
       system(cmdline(f))
     end
@@ -17,16 +18,20 @@ class Rover
 
   private
 
-  def variant
-    @variant ||= ENV.fetch('APOLLO_VARIANT', Rails.env)
-  end
-
   def base
-    "rover subgraph #{command} quilt-api@#{variant}"
+    "APOLLO_KEY=#{key} rover subgraph #{command} #{supergraph}@#{variant}"
   end
 
   def cmdline(file)
     "#{base} --name <%= app_name -%> --schema \"#{file.path}\" #{optional_args}".strip
+  end
+
+  def context
+    admin ? { current_user: AdminUser.new(email: 'publish@schema.com') } : {}
+  end
+
+  def key
+    @key ||= ENV.fetch(admin ? 'ADMIN_APOLLO_KEY' : 'APOLLO_KEY')
   end
 
   def optional_args
@@ -35,9 +40,25 @@ class Rover
 
   def routing_url
     if variant == 'local'
-      'http://localhost:3000/graphql'
+      "http://localhost:<%= 3000 + port_offset %>/#{routing_path}"
     else
-      'http://service-<%= app_name -%>/graphql'
+      "http://service-<%= app_name -%>/#{routing_path}"
     end
+  end
+
+  def routing_path
+    admin ? 'graphql/admin' : 'graphql'
+  end
+
+  def schema
+    admin ? Admin::Schema : Schema
+  end
+
+  def supergraph
+    admin ? 'liminal-admin-api' : 'quilt-api'
+  end
+
+  def variant
+    @variant ||= ENV.fetch('APOLLO_VARIANT', Rails.env)
   end
 end

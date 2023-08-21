@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class Query < Base
+  class Query < Shared::Types::Base
     description 'The base query type for this schema'
 
     field :health, Types::Health, 'Health of the server', inaccessible: true, resolver_method: :itself, shareable: true
