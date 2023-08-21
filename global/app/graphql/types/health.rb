@@ -11,6 +11,7 @@ module Types
 
     def deep_check
       ApplicationRecord.connection
+      Rails.configuration.redis_pool.get('health') if Rails.configuration.respond_to?(:redis_pool)
       Rails.logger.info('Deep health check succeeded')
       true
     end
