@@ -4,9 +4,9 @@ locals {
   app_name = "<%= app_name -%>"
 
   db_instance_class = {
-    dev: "db.t4g.medium",
-    stage: "db.t4g.medium",
-    prod: "db.r6g.xlarge",
+    dev : "db.t4g.medium",
+    stage : "db.t4g.medium",
+    prod : "db.r6g.xlarge",
   }[terraform.workspace]
 }
 
@@ -15,6 +15,11 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "4.65.0"
+    }
+
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.21.1"
     }
   }
 
@@ -36,5 +41,16 @@ provider "aws" {
     tags = {
       managed_by = "terraform"
     }
+  }
+}
+
+provider "kubernetes" {
+  host                   = data.terraform_remote_state.core.outputs.eks_cluster_endpoint
+  cluster_ca_certificate = base64decode(data.terraform_remote_state.core.outputs.eks_cluster_certificate_authority_data)
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["--profile", "quilt-mfa", "eks", "get-token", "--cluster-id", data.terraform_remote_state.core.outputs.eks_cluster_id]
   }
 }
