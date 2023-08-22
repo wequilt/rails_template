@@ -1,7 +1,7 @@
 FROM ruby:3.2.2-alpine
 
 RUN apk update && \
-    apk add build-base curl<%= ' postgresql-dev' if postgres? -%> coreutils npm git && \
+    apk add build-base curl<%= ' postgresql-dev' if postgres? -%> coreutils npm git jq && \
     rm -rf /var/cache/apk/
 
 RUN npm install -g @apollo/rover
