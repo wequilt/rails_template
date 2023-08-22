@@ -37,6 +37,14 @@ https://aws.amazon.com/cli/ for more information on the AWS CLI and
 https://www.notion.so/quilt/AWS-STS-Auth-Setup-dbceea78d75b4839b67d5739fcde726b for instructions to
 set up the CLI on your machine (with support for 2FA).
 
+### Terraform
+Configuring production database clusters, Kubernetes service accounts, etc. for this new service
+is done through Terraform. As long as you have successfully configured the AWS CLI (see above)
+you should be able to simply `brew install terraform` to install the Terraform client. Most
+Terraform operations are performed by remotely by Atlantis as part of the pull request process
+but the template does a `terraform init` to ensure Terraform is set up correctly, generate a
+lockfile, etc. as part of the service creation.
+
 ### Clone Me
 The last step before using this template is to clone it somewhere on your local machine. The
 template makes heavy use of Thor `template` and `copy_file` which don't work when the template is

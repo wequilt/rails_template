@@ -5,7 +5,7 @@ projects:
     autoplan:
       when_modified: [ "../terraform/**/*", "../atlantis.yaml" ]
       enabled: true
-    apply_requirements: [ mergeable ]
+    apply_requirements: [ approved ]
     workspace: dev
 
   - name: stage
@@ -13,7 +13,7 @@ projects:
     autoplan:
       when_modified: [ "../terraform/**/*", "../atlantis.yaml" ]
       enabled: true
-    apply_requirements: [ mergeable ]
+    apply_requirements: [ approved ]
     workspace: stage
 
   - name: prod
@@ -21,5 +21,5 @@ projects:
     autoplan:
       when_modified: [ "../terraform/**/*", "../atlantis.yaml" ]
       enabled: true
-    apply_requirements: [ mergeable ]
+    apply_requirements: [ approved ]
     workspace: prod

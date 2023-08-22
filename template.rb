@@ -112,6 +112,8 @@ check_aws_capability!
 
 add_secret 'rds-master-password', SecureRandom.hex(32)
 add_secret 'secret-key-base', SecureRandom.hex(64)
+add_secret 'apollo-key', ask('Apollo key =>')
+add_secret 'admin-apollo-key', ask('Admin Apollo key =>')
 
 create_file '.ruby-gemset', app_name
 
@@ -163,6 +165,8 @@ gsub_file 'config/environments/production.rb', /# Use default logging formatter.
 end
 
 run 'rubocop -A -f quiet'
+run 'terraform -chdir=terraform init'
+run 'rake db:migrate' if postgres?
 
 after_bundle do
   repo = "git@github.com:wequilt/#{app_name}.git"
