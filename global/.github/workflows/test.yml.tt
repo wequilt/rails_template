@@ -7,6 +7,8 @@ on:
         required: true
       APOLLO_KEY_API:
         required: true
+      APOLLO_KEY_ADMIN_API:
+        required: true
 
 jobs:
   test:
@@ -71,6 +73,9 @@ jobs:
         run: bin/rails db:setup
 
 <% end -%>
+      - name: Install rover
+        run: npm install -g @apollo/rover
+
       - name: Ensure schema is composable
         env:
           APOLLO_KEY: ${{ secrets.APOLLO_KEY_API }}
@@ -78,6 +83,13 @@ jobs:
           npm install -g @apollo/rover
           APOLLO_VARIANT=staging bundle exec rake graphql:federation:check
           APOLLO_VARIANT=production bundle exec rake graphql:federation:check
+
+      - name: Ensure admin schema is composable
+        env:
+          ADMIN_APOLLO_KEY: ${{ secrets.APOLLO_KEY_ADMIN_API }}
+        run: |
+          APOLLO_VARIANT=staging bundle exec rake graphql:federation:admin:check
+          APOLLO_VARIANT=production bundle exec rake graphql:federation:admin:check
 
       - name: Run tests and report coverage
         uses: paambaati/codeclimate-action@v4.0.0

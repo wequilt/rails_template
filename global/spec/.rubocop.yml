@@ -23,3 +23,4 @@ Style/MethodCallWithArgsParentheses:
     - to
     - not_to
     - describe
+    - shared_examples

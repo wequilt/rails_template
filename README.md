@@ -56,9 +56,10 @@ generator won't be able to push to GitHub*
 These are the steps you'll want to follow to create and configure a new repository.
 1. Create the repo in GitHub. Choose all options to make an empty repository (no default README,
    .gitignore, etc).
-2. Grant the new repository access to the `APOLLO_API_KEY`, `AWS_ACCESS_KEY_ID`,
-   `AWS_SECRET_ACCESS_KEY`, and `GHA_ACCESS_TOKEN` Actions organization secrets in GitHub. Also
-   grant access to the `APOLLO_API_KEY` Dependabot secret in GitHub.
+2. Grant the new repository access to the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` Actions
+   organization secrets in GitHub. All other needed secrets are available to all private
+   repositories but mobile app builds and backend builds use different AWS credentials so different
+   secrets are needed.
 
 ## Service Creation
 With your environment configurated you can now proceed to generating the new Rails app. The `rails

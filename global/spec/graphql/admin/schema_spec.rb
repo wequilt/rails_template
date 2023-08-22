@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Schema do
+RSpec.describe Admin::Schema do
   let(:schema) { described_class }
 
   it_behaves_like 'a graphql schema'

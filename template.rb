@@ -27,9 +27,7 @@ def create_or_update_secrets!
     output = `aws secretsmanager create-secret --name #{name} --secret-string #{secret_string} 2>&1`
     if output.include?('ResourceExistsException')
       action, color = :skip, :yellow
-    end
-
-    if output.include?('An error occurred')
+    elsif output.include?('An error occurred')
       say "An error occurred creating secret in AWS Secrets Manager: #{output}"
       exit 1
     end
@@ -144,7 +142,7 @@ gsub_file 'config/environments/production.rb', /# Use default logging formatter.
             operation: controller.operation_name,
             query: controller.query,
             variables: controller.variables,
-            user_id: controller.context[:current_user]&.id
+            user_id: controller.public_context[:current_user]&.id || controller.admin_context[:current_user]&.id
           }
         end
       end

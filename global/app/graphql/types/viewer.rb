@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class Viewer < Base
+  class Viewer < Shared::Types::Base
     extend_type
     key fields: :id
 

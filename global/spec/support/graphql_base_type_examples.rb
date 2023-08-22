@@ -2,9 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Types::Base, type: :graphql do
-  subject(:type) { described_class }
-
+RSpec.shared_examples 'a graphql base type' do
   it 'includes Apollo Federation support' do
     expect(type).to include(ApolloFederation::Object)
   end

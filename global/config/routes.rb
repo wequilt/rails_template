@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  post '/graphql', to: 'graphql#execute'
-  get '/health', to: proc { [200, {}, ['success']] }
+  post '/graphql', to: 'graphql#public_execute'
+  post '/graphql/admin', to: 'graphql#admin_execute'
 end

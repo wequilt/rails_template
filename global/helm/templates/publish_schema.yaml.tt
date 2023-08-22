@@ -16,8 +16,13 @@ spec:
       containers:
       - name: schema-publish
         image: {{ .Values.image }}
-        command: ["rake"]
-        args: ["graphql:federation:publish"]
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            rake graphql:federation:publish
+            rake graphql:federation:admin:publish
+            curl -sf -XPOST http://127.0.0.1:15020/quitquitquit || true # ignore for disabled istio proxy
         resources:
           limits:
             cpu: "1"
@@ -45,6 +50,11 @@ spec:
             secretKeyRef:
               name: "{{ .Release.Name }}"
               key: apollo-key
+        - name: ADMIN_APOLLO_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}"
+              key: admin-apollo-key
         - name: SECRET_KEY_BASE
           valueFrom:
             secretKeyRef:
