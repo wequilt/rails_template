@@ -166,6 +166,7 @@ end
 
 run 'rubocop -A -f quiet'
 run 'terraform -chdir=terraform init'
+run 'rake db:migrate' if postgres?
 
 after_bundle do
   repo = "git@github.com:wequilt/#{app_name}.git"
