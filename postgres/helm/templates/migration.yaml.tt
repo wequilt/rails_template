@@ -16,15 +16,17 @@ spec:
       containers:
       - name: migrations
         image: {{ .Values.image }}
-        command: ["rake"]
-        args: ["db:migrate"]
+        command:
+          - "/bin/sh"
+          - "-xec"
+          - |
+            rake db:migrate
+            curl -sf -XPOST http://127.0.0.1:15020/quitquitquit || true # ignore for disabled istio proxy
         resources:
           limits:
-            cpu: "1"
-            memory: 2Gi
+            memory: 500Mi
           requests:
             cpu: 200m
-            memory: 500Mi
         env:
         - name: DD_AGENT_HOST
           value: datadog.infrastructure.svc.cluster.local
