@@ -163,6 +163,7 @@ gsub_file 'config/environments/production.rb', /# Use default logging formatter.
 end
 
 run 'rubocop -A -f quiet'
+run 'terraform -chdir=terraform init'
 
 after_bundle do
   repo = "git@github.com:wequilt/#{app_name}.git"
