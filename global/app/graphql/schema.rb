@@ -29,19 +29,6 @@ class Schema < GraphQL::Schema
   use GraphQL::Dataloader
   use GraphQL::Tracing::DataDogTracing, service: 'graphql'
 
-  def self.type_authorized?(type, object, context)
-    validate_authentication!(context)
-    policy_class_for(type).new.authorized?(context[:current_user], object)
-  end
-
-  def self.type_visible?(_type, _context)
-    true
-  end
-
-  def self.resolve_type(_abstract_type, obj, _ctx)
-    type_namespaces.find { |n| n.const_defined?(obj.class.name, false) }&.const_get(obj.class.name, false)
-  end
-
   def self.id_from_object(object, _type_definition, _query_ctx)
     object.to_gid_param
   end
@@ -52,12 +39,31 @@ class Schema < GraphQL::Schema
     nil
   end
 
-  def self.unauthorized_object(_error)
-    raise AuthorizationFailed
-  end
-
   def self.policy_class_for(type)
     Object.const_get("#{type}Policy")
+  end
+
+  def self.resolve_type(_abstract_type, obj, _ctx)
+    return ctx.warden.get_type(ctx[:__typename]) if ctx[:__typename].present?
+
+    type_namespaces.find { |n| n.const_defined?(obj.class.name, false) }&.const_get(obj.class.name, false)
+  end
+
+  def self.type_authorized?(type, object, context)
+    validate_authentication!(context)
+    policy_class_for(type).new.authorized?(context[:current_user], object)
+  end
+
+  def self.type_namespaces
+    @type_namespaces ||= [Types, Shared::Types]
+  end
+
+  def self.type_visible?(_type, _context)
+    true
+  end
+
+  def self.unauthorized_object(_error)
+    raise AuthorizationFailed
   end
 
   def self.validate_authentication!(context)
@@ -65,9 +71,5 @@ class Schema < GraphQL::Schema
       raise AuthenticationFailed if user.blank?
       raise ArgumentError, "Wrong type for '#{user}'" unless user.is_a?(::User)
     end
-  end
-
-  def self.type_namespaces
-    @type_namespaces ||= [Types, Shared::Types]
   end
 end

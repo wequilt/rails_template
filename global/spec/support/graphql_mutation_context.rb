@@ -8,12 +8,12 @@ module GraphQLMutationContext
 
   let(:allow_any_user?) { false }
   let(:return_type) { described_class.name.demodulize.sub(/^./, &:downcase) }
-  let(:allowed_nullable_fields) { [] }
+  let(:allowed_non_nullable_fields) { [] }
 
   context 'when inspecting the mutation definition' do
     described_class.fields.excluding('errors').each do |name, field|
       it "returns expected nullability for '#{name}'" do
-        expect(field.type.non_null?).to be(allowed_nullable_fields.include?(field.method_sym))
+        expect(field.type.non_null?).to be(allowed_non_nullable_fields.include?(field.method_sym))
       end
     end
 
