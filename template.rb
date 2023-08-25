@@ -78,7 +78,7 @@ def postgres?
 end
 
 def postgres_version
-  '15.2'
+  '15.3'
 end
 
 def process_files(subdir)
