@@ -7,9 +7,9 @@ module GraphQLTypeContext
   include GraphQLSharedContext
 
   let(:record_id) { raise 'record_id must be implemented' }
-  let(:allow_any_user?) { false }
+  let(:allow_any_user?) { admin? }
   let(:use_entities?) do
-    described_class.federation_directives.pluck(:name).any? { |name| %w[extends shareable].include?(name) }
+    described_class.federation_directives.pluck(:name).include?('key')
   end
   let(:graphql_type) { described_class.to_type_signature }
   let(:query) { use_entities? ? entities_query : node_query }
@@ -27,8 +27,8 @@ module GraphQLTypeContext
   end
   let(:node_query) do
     %(
-      query GetNode($id: ID!) {
-        node(id: $id) {
+      query GetNode($id: ID!, $typename: String!) {
+        node(id: $id, typename: $typename) {
           ... on #{graphql_type} { #{selections} }
         }
       }
@@ -38,7 +38,7 @@ module GraphQLTypeContext
     if use_entities?
       { representations: [{ __typename: graphql_type, id: record_id }] }
     else
-      { id: record_id }
+      { id: record_id, typename: graphql_type }
     end
   end
 
@@ -63,10 +63,13 @@ module GraphQLTypeContext
   end
 
   context 'when trying authenticated access with a random user' do
-    let(:context) { { current_user: User.new(id: generate_user_gid) } }
+    let(:context) { { current_user: random_user } }
     let(:have_expected_data) { allow_any_user? ? be_truthy : be_nil }
-    let(:expected_error) { allow_any_user? ? nil : 'You are not authorized' }
-    let(:expected_code) { allow_any_user? ? nil : 'AUTHORIZATION_FAILED' }
+    let(:expected_error) { allow_any_user? ? nil : failure_message }
+    let(:expected_code) { allow_any_user? ? nil : failure_code }
+    let(:failure_message) { admin? ? /Schema is not configured for (queries|mutations)/ : 'You are not authorized' }
+    let(:failure_code) { admin? ? /missing(Query|Mutation)Configuration/ : 'AUTHORIZATION_FAILED' }
+    let(:random_user) { admin? ? AdminUser.new(email: Faker::Internet.email) : User.new(id: generate_user_gid) }
 
     it 'conforms to allow_any_user? for data' do
       expect(data).to have_expected_data
