@@ -7,6 +7,7 @@ projects:
       enabled: true
     apply_requirements: [ approved ]
     workspace: dev
+    workflow: custom
 
   - name: stage
     dir: terraform/
@@ -15,6 +16,7 @@ projects:
       enabled: true
     apply_requirements: [ approved ]
     workspace: stage
+    workflow: custom
 
   - name: prod
     dir: terraform/
@@ -23,3 +25,12 @@ projects:
       enabled: true
     apply_requirements: [ approved ]
     workspace: prod
+    workflow: custom
+
+workflows:
+  custom:
+    plan:
+      steps:
+        - init
+        - plan:
+            extra_args: ["-var", "confirm=${WORKSPACE}"]
