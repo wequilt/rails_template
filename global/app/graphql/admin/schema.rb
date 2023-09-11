@@ -22,7 +22,7 @@ module Admin
     include ApolloFederation::Schema
     federation version: '2.0'
 
-    description 'The admin schema for the Publishing graph'
+    description "The admin schema for the #{Rails.application.class.module_parent} graph"
 
     query Admin::Types::Query unless Admin::Types::Query.fields.empty?
     mutation Admin::Types::Mutation unless Admin::Types::Mutation.fields.empty?
