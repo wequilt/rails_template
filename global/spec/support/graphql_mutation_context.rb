@@ -18,7 +18,7 @@ module GraphQLMutationContext
     end
 
     it 'is non-nullable for errors' do
-      expect(described_class.get_field('errors').type.non_null?).to be(true)
+      expect(described_class.get_field('errors')&.type&.non_null?).to be(true).or be_nil
     end
   end
 

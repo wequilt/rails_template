@@ -41,21 +41,23 @@ module GraphQLTypeContext
       { id: record_id, typename: graphql_type }
     end
   end
-
-  context 'when selecting all fields' do
-    let(:selections) do
-      described_class.fields.map do |name, field|
-        sub_field_for(field).then do |sub_field|
-          if field.connection?
-            "#{name} { nodes #{sub_field} }"
-          else
-            args_for(field).then do |args|
-              args.present? ? "#{name}(#{args}) #{sub_field}" : "#{name} #{sub_field}"
-            end
+  let(:auto_selections) do
+    described_class.fields.map do |name, field|
+      sub_field_for(field).then do |sub_field|
+        if field.connection?
+          "#{name} { nodes #{sub_field} }"
+        else
+          args_for(field).then do |args|
+            args.present? ? "#{name}(#{args}) #{sub_field}" : "#{name} #{sub_field}"
           end
         end
-      end.join(' ')
-    end
+      end
+    end.join(' ')
+  end
+  let(:selections) { auto_selections }
+
+  context 'when selecting all fields' do
+    let(:selections) { auto_selections }
 
     it 'returns all of the fields without error' do
       expect(data.keys).to match_array(described_class.fields.symbolize_keys.keys)
@@ -69,7 +71,6 @@ module GraphQLTypeContext
     let(:expected_code) { allow_any_user? ? nil : failure_code }
     let(:failure_message) { admin? ? /Schema is not configured for (queries|mutations)/ : 'You are not authorized' }
     let(:failure_code) { admin? ? /missing(Query|Mutation)Configuration/ : 'AUTHORIZATION_FAILED' }
-    let(:random_user) { admin? ? AdminUser.new(email: Faker::Internet.email) : User.new(id: generate_user_gid) }
 
     it 'conforms to allow_any_user? for data' do
       expect(data).to have_expected_data

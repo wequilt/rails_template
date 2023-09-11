@@ -3,18 +3,26 @@
 module GraphQLInspectionHelpers
   extend RSpec::SharedContext
 
+  let(:inspect_id_map) { raise 'Must be defined' }
+
   def args_for(field)
     field.arguments.map do |arg_name, arg|
       next unless arg.type.non_null?
 
-      if arg.type.of_type == GraphQL::Types::String
-        "#{arg_name}: \"test\""
-      elsif arg.type.of_type == GraphQL::Types::Int
-        "#{arg_name}: 1"
-      else
-        "#{arg_name}: #{arg.type.of_type.values.keys.first}"
-      end
+      arg_value_for(field, arg, arg_name)
     end.join(' ')
+  end
+
+  def arg_value_for(field, arg, arg_name)
+    if arg.type.of_type == GraphQL::Types::String
+      %(#{arg_name}: "test")
+    elsif arg.type.of_type == GraphQL::Types::Int
+      "#{arg_name}: 1"
+    elsif arg.type.of_type == GraphQL::Types::ID
+      %(#{arg_name}: "#{inspect_id_map.with_indifferent_access.dig(field.name, arg_name)}")
+    else
+      "#{arg_name}: #{arg.type.of_type.values.keys.first}"
+    end
   end
 
   def sub_field_for_connection(field)

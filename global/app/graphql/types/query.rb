@@ -22,13 +22,11 @@ module Types
     end
 
     def viewer
-      raise AuthenticationFailed if context[:current_user].blank?
-
-      context[:current_user]
+      context[:current_user] || ::User.new(id: Base64.encode64('unauthenticated'))
     end
 
     def self.authorized?(object, context)
-      QueryPolicy.new.authorized?(context[:current_user], object)
+      QueryPolicy.new(context[:current_user]).authorized?(object)
     end
   end
 end

@@ -2,7 +2,9 @@
 
 module Types
   class QueryPolicy < ApplicationPolicy
-    def authorized?(_user, _object)
+    allow_anonymous_access
+
+    def authorized?(_object)
       true
     end
   end
