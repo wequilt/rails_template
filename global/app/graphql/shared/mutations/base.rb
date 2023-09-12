@@ -7,13 +7,14 @@ module Shared
 
       null false
 
-      def authorized?(*, **)
-        context.schema.mutation_authorized?(self.class, *, **, context:)
-      end
-
-      def self.visible?(context)
-        context.schema.type_visible?(self, context)
-      end
+      # Uncomment if needed
+      # def authorized?(*, **)
+      #   context.schema.mutation_authorized?(self.class, *, **, context:)
+      # end
+      #
+      # def self.visible?(context)
+      #   context.schema.type_visible?(self, context)
+      # end
     end
   end
 end
