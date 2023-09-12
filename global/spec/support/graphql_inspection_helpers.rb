@@ -9,19 +9,17 @@ module GraphQLInspectionHelpers
     field.arguments.map do |arg_name, arg|
       next unless arg.type.non_null?
 
-      arg_value_for(field, arg, arg_name)
+      "#{arg_name}: #{arg_value_for(field, arg.type.of_type, arg_name)}"
     end.join(' ')
   end
 
-  def arg_value_for(field, arg, arg_name)
-    if arg.type.of_type == GraphQL::Types::String
-      %(#{arg_name}: "test")
-    elsif arg.type.of_type == GraphQL::Types::Int
-      "#{arg_name}: 1"
-    elsif arg.type.of_type == GraphQL::Types::ID
-      %(#{arg_name}: "#{inspect_id_map.with_indifferent_access.dig(field.name, arg_name)}")
-    else
-      "#{arg_name}: #{arg.type.of_type.values.keys.first}"
+  def arg_value_for(field, type, arg_name)
+    # case uses === which roughly translates to "is_a?" so a class object isn't === itself
+    case type.name
+    when 'GraphQL::Types::String' then '"test"'
+    when 'GraphQL::Types::Int' then 1
+    when 'GraphQL::Types::ID' then %("#{inspect_id_map.with_indifferent_access.dig(field.name, arg_name)}")
+    else type.values.keys.first
     end
   end
 
