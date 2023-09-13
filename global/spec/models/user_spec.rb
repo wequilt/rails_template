@@ -5,12 +5,12 @@ require 'rails_helper'
 RSpec.describe User do
   subject(:user) { described_class.new(data) }
 
-  let(:data) { { id:, name: } }
+  let(:data) { { id:, roles: } }
   let(:id) { SecureRandom.uuid }
-  let(:name) { Faker::Name.name }
+  let(:roles) { ['provider'] }
 
   shared_examples 'return expected values' do
-    it { is_expected.to have_attributes(id:) }
+    it { is_expected.to have_attributes(id:, roles:) }
   end
 
   it_behaves_like 'return expected values'
@@ -28,7 +28,7 @@ RSpec.describe User do
   end
 
   context 'when data is a string-keyed hash' do
-    let(:data) { { 'id' => id } }
+    let(:data) { { 'id' => id, 'roles' => ['provider'] } }
 
     it_behaves_like 'return expected values'
   end

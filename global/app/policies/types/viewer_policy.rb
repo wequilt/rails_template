@@ -2,8 +2,10 @@
 
 module Types
   class ViewerPolicy < ApplicationPolicy
-    def authorized?(user, object)
-      user.id == object.id
+    allow_anonymous_access
+
+    def authorized?(_object)
+      true
     end
   end
 end
