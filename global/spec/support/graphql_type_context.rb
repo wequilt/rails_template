@@ -41,20 +41,6 @@ module GraphQLTypeContext
       { id: record_id, typename: graphql_type }
     end
   end
-  let(:auto_selections) do
-    described_class.fields.map do |name, field|
-      sub_field_for(field).then do |sub_field|
-        if field.connection?
-          "#{name} { nodes #{sub_field} }"
-        else
-          args_for(field).then do |args|
-            args.present? ? "#{name}(#{args}) #{sub_field}" : "#{name} #{sub_field}"
-          end
-        end
-      end
-    end.join(' ')
-  end
-  let(:selections) { auto_selections }
 
   context 'when selecting all fields' do
     let(:selections) { auto_selections }
