@@ -46,7 +46,7 @@ module GraphQLTypeContext
     let(:selections) { auto_selections }
 
     it 'returns all of the fields without error' do
-      expect(data.keys).to match_array(described_class.fields.symbolize_keys.keys)
+      expect(data.keys).to match_array(type_for_selection.fields.symbolize_keys.keys)
     end
   end
 

@@ -4,6 +4,7 @@ module GraphQLInspectionHelpers
   extend RSpec::SharedContext
 
   let(:inspect_id_map) { raise 'Must be defined' }
+  let(:field_selection_overrides) { {} }
 
   def args_for(field)
     field.arguments.map do |arg_name, arg|
@@ -55,6 +56,7 @@ module GraphQLInspectionHelpers
 
   def sub_field_for(field)
     [
+      field_selection_overrides.with_indifferent_access[field.name],
       sub_field_for_connection(field),
       sub_field_for_null(field),
       sub_field_for_non_null(field),
