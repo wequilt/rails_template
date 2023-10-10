@@ -9,13 +9,14 @@ module Shared
 
       field_class Fields::Base
 
-      def self.authorized?(object, context)
-        context.schema.type_authorized?(self, object, context)
-      end
-
-      def self.visible?(context)
-        context.schema.type_visible?(self, context)
-      end
+      # Uncomment if needed
+      # def self.authorized?(object, context)
+      #   context.schema.type_authorized?(self, object, context)
+      # end
+      #
+      # def self.visible?(context)
+      #   context.schema.type_visible?(self, context)
+      # end
     end
   end
 end

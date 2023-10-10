@@ -11,6 +11,10 @@ class User
     data[:id]
   end
 
+  def roles
+    data[:roles] || []
+  end
+
   def ==(other)
     id == other.id
   end

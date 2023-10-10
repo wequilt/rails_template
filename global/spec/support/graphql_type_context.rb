@@ -57,7 +57,6 @@ module GraphQLTypeContext
     let(:expected_code) { allow_any_user? ? nil : failure_code }
     let(:failure_message) { admin? ? /Schema is not configured for (queries|mutations)/ : 'You are not authorized' }
     let(:failure_code) { admin? ? /missing(Query|Mutation)Configuration/ : 'AUTHORIZATION_FAILED' }
-    let(:random_user) { admin? ? AdminUser.new(email: Faker::Internet.email) : User.new(id: generate_user_gid) }
 
     it 'conforms to allow_any_user? for data' do
       expect(data).to have_expected_data
