@@ -43,22 +43,10 @@ module GraphQLTypeContext
   end
 
   context 'when selecting all fields' do
-    let(:selections) do
-      described_class.fields.map do |name, field|
-        sub_field_for(field).then do |sub_field|
-          if field.connection?
-            "#{name} { nodes #{sub_field} }"
-          else
-            args_for(field).then do |args|
-              args.present? ? "#{name}(#{args}) #{sub_field}" : "#{name} #{sub_field}"
-            end
-          end
-        end
-      end.join(' ')
-    end
+    let(:selections) { auto_selections }
 
     it 'returns all of the fields without error' do
-      expect(data.keys).to match_array(described_class.fields.symbolize_keys.keys)
+      expect(data.keys).to match_array(type_for_selection.fields.symbolize_keys.keys)
     end
   end
 

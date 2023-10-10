@@ -3,18 +3,25 @@
 module GraphQLInspectionHelpers
   extend RSpec::SharedContext
 
+  let(:inspect_id_map) { raise 'Must be defined' }
+  let(:field_selection_overrides) { {} }
+
   def args_for(field)
     field.arguments.map do |arg_name, arg|
       next unless arg.type.non_null?
 
-      if arg.type.of_type == GraphQL::Types::String
-        "#{arg_name}: \"test\""
-      elsif arg.type.of_type == GraphQL::Types::Int
-        "#{arg_name}: 1"
-      else
-        "#{arg_name}: #{arg.type.of_type.values.keys.first}"
-      end
+      "#{arg_name}: #{arg_value_for(field, arg.type.of_type, arg_name)}"
     end.join(' ')
+  end
+
+  def arg_value_for(field, type, arg_name)
+    # case uses === which roughly translates to "is_a?" so a class object isn't === itself
+    case type.name
+    when 'GraphQL::Types::String' then '"test"'
+    when 'GraphQL::Types::Int' then 1
+    when 'GraphQL::Types::ID' then %("#{inspect_id_map.with_indifferent_access.dig(field.name, arg_name)}")
+    else type.values.keys.first
+    end
   end
 
   def sub_field_for_connection(field)
@@ -49,6 +56,7 @@ module GraphQLInspectionHelpers
 
   def sub_field_for(field)
     [
+      field_selection_overrides.with_indifferent_access[field.name],
       sub_field_for_connection(field),
       sub_field_for_null(field),
       sub_field_for_non_null(field),
