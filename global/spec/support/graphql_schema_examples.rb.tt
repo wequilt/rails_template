@@ -4,10 +4,11 @@ require 'rails_helper'
 
 RSpec.shared_examples 'a graphql schema' do
   let(:object) { AdminUser.new(email: Faker::Internet.email) }
-  let(:id) { object.to_gid_param }
+  let(:id) { object.to_gid.to_s }
+  let(:graphql_id) { Base64.urlsafe_encode64(id) }
 
   describe '.object_from_id' do
-    subject(:object_from_id) { schema.object_from_id(id, {}) }
+    subject(:object_from_id) { schema.object_from_id(graphql_id, {}) }
 
     it 'returns the object' do
       expect(object_from_id).to eq(object)
@@ -18,9 +19,31 @@ RSpec.shared_examples 'a graphql schema' do
 
       before { allow(AdminUser).to receive(:find).and_raise(ActiveRecord::RecordNotFound) }
 
-      it 'returns nil' do
-        expect(object_from_id).to be_nil
-      end
+      it { is_expected.to be_nil }
+    end
+
+    context 'when the id is from another service' do
+      let(:id) { 'gid://otherservice/OtherServiceModel/1' }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when the id is from this service but the referenced model does not exist' do
+      let(:id) { 'gid://<%= app_name -%>/ThisModelDoesNotExist/1' }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when the id is not a valid gid' do
+      let(:id) { 'http://this.is.not.a.gid' }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when the GraphQL id is not Base64 encoded' do
+      let(:graphql_id) { SecureRandom.uuid }
+
+      it { is_expected.to be_nil }
     end
   end
 
