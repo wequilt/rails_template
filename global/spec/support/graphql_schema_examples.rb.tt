@@ -29,7 +29,7 @@ RSpec.shared_examples 'a graphql schema' do
     end
 
     context 'when the id is from this service but the referenced model does not exist' do
-      let(:id) { 'gid://<%= 3000 + port_offset -%>/ThisModelDoesNotExist/1' }
+      let(:id) { 'gid://<%= app_name -%>/ThisModelDoesNotExist/1' }
 
       it { is_expected.to be_nil }
     end

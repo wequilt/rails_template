@@ -38,9 +38,9 @@ module Shared
       # load the object decoding the GID into its Rails ID. If not a Rails model, simply use the GID as the object's ID.
       def object_from_id(global_id, _query_ctx)
         GlobalID.parse(global_id).then do |parts|
-          parts.app.eql?('messaging') ? GlobalID.find(global_id) : parts.model_class.find(global_id)
+          parts.app.eql?('<%= app_name -%>') ? GlobalID.find(global_id) : parts.model_class.find(global_id)
         end
-      rescue ActiveRecord::RecordNotFound
+      rescue NameError, ActiveRecord::RecordNotFound
         nil
       end
     end
