@@ -1,6 +1,3 @@
 ---
 env: dev
 image: ""
-deployment:
-  minReplicas: 2
-  maxReplicas: 10
