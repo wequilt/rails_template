@@ -4,7 +4,11 @@ kind: Deployment
 metadata:
   name: "{{ .Release.Name }}"
 spec:
-  replicas: {{ .Values.deployment.minReplicas }}
+  {{- if eq .Values.env "prod" }}
+  replicas: 2
+  {{- else }}
+  replicas: 1
+  {{- end }}
   selector:
     matchLabels:
       service: <%= app_name %>

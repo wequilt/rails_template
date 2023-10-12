@@ -8,8 +8,13 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: "{{ .Release.Name }}"
-  minReplicas: {{ .Values.deployment.minReplicas }}
-  maxReplicas: {{ .Values.deployment.maxReplicas }}
+  {{- if eq .Values.env "prod" }}
+  minReplicas: 1
+  maxReplicas: 10
+  {{- else }}
+  minReplicas: 1
+  maxReplicas: 1
+  {{- end }}
   metrics:
     - type: Resource
       resource:
