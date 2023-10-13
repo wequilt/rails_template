@@ -27,7 +27,7 @@ spec:
           limits:
             memory: 500Mi
           requests:
-            cpu: 200m
+            cpu: 50m
         env:
         - name: DD_AGENT_HOST
           value: datadog.infrastructure.svc.cluster.local

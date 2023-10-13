@@ -22,11 +22,17 @@ spec:
       - name: <%= app_name %>
         image: {{ .Values.image }}
         resources:
-          limits:
-            memory: 700Mi
+          {{- if eq .Values.env "prod" }}
           requests:
             cpu: 200m
+          limits:
             memory: 700Mi
+          {{- else }}
+          requests:
+            cpu: 50m
+          limits:
+            memory: 500Mi
+          {{- end }}
         env:
         - name: AWS_REGION
           value: us-west-2
