@@ -28,8 +28,6 @@ spec:
           limits:
             memory: 700Mi
           {{- else }}
-          requests:
-            cpu: 50m
           limits:
             memory: 500Mi
           {{- end }}
